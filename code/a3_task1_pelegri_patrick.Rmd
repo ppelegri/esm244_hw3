@@ -24,7 +24,6 @@ A useful descriptive introductory summary (3 - 4 sentences) that helps the audie
 env_df <- read_csv(here('data', 'world_env_vars.csv')) %>% 
   drop_na()
 
-head(env_raw_df, 6)
 
 ```
 
@@ -37,26 +36,23 @@ env_pca <- env_df %>%
 
 ```
 
-```{r create df using rotated axes from pca}
-loadings_df <- data.frame(env_pca$rotation) %>% # take rotation vector from env_pca
-  mutate(axis = row.names(.)) 
+### biplot
 
-new_pts_df <- data.frame(env_pca$x) 
-```
-
-```{r plot biplot}
-ggplot() + 
-  geom_point(data = new_pts_df, aes(x = PC1, y = PC2), color = 'blue') +
-  geom_segment(data = loadings_df, x = 0, y = 0,
-               aes(xend = PC1, yend = PC2, group = axis),
-               arrow = arrow(length = unit(0.25, 'cm'))) +
-  geom_text(data = loadings_df,
-            aes(x = PC1, y = PC2, label = axis),
-            vjust = 0, nudge_y = .2) +
+```{r}
+autoplot(env_pca,
+         data = env_df,
+         loadings = TRUE,
+         loadings.label = TRUE, # show labels of original vectors
+         loadings.colour = 'black',
+         loadings.label.colour = 'black',
+         loadings.label.vjust = -0.5) +
+  scale_color_manual(values = c('darkslateblue', 'cornsilk4', 'orange4')) +
   theme_minimal()
 ```
 
-
+```{r}
+screeplot(env_pca, type = 'lines')
+```
 
 
 
