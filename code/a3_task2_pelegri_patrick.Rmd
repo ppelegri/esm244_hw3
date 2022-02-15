@@ -2,22 +2,20 @@
 title: 'Task 2: Hierarchical clustering (PELEGRI)'
 author: "Patrick Pelegri-O'Day"
 date: "2/14/2022"
-output: 
-  html_document
+output:
+  html_document: 
+    theme: flatly
+    highlight: pygments
     code_folding: hide
-
 ---
 
-## Overview
+### Overview
 
-overview text
+This report uses hierarchical clustering by complete linkage to create a dendogram showing multivariate clustering for water chemistry by site. A tanglegram is generated to show how clustering using single linkage and complete linkage differ. The data are drawn from six Santa Barbara Coastal Long Term Ecological Research (LTER) sites. Monitoring has been ongoing since year 2000.
 
-DATA & METADATA SOURCE: 
-SBC LTER: Stream chemistry in the Santa Barbara Coastal drainage area, ongoing since 2000
-Creators: Santa Barbara Coastal LTER, & Melack, John M
-Citation: Santa Barbara Coastal LTER and J. Melack. 2019. SBC LTER: Land: Stream chemistry in the Santa Barbara Coastal drainage area, ongoing since 2000 ver 16. Environmental Data Initiative. https://doi.org/10.6073/pasta/67a558a24ceed9a0a5bf5e46ab841174. 
+**Citation:** Santa Barbara Coastal LTER and J. Melack. 2019. SBC LTER: Land: Stream chemistry in the Santa Barbara Coastal drainage area, ongoing since 2000 ver 16. Environmental Data Initiative. https://doi.org/10.6073/pasta/67a558a24ceed9a0a5bf5e46ab841174. 
 
-## Setup
+### Setup
 
 ```{r setup, include=TRUE, message = FALSE, warning = FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
@@ -32,6 +30,7 @@ library(ggdendro)
 ```{r read in data}
 water_raw_df <- read_csv(here('data', 'sbc_lter_registered_stream_chemistry.csv'))
 ```
+
 Prepare data for clustering
 ```{r drop NAs}
 # Drop NAs
@@ -40,6 +39,7 @@ water_dropna_df <- water_raw_df %>%
   drop_na()
 ```
 
+To perform hierarchical clustering by site, we need to reformat the data so that the data are arranged in a single summary row per site based on means from all observations at that site.
 ```{r summarize and scale data}
 # Group by site code and summarize to get mean of each variable
 water_summarize_df <- water_dropna_df %>% 
@@ -60,24 +60,34 @@ Calculate distance matrix using Euclidean distance
 euc_distance <- dist(water_scaled_df, method = 'euclidean', diag = TRUE, upper = TRUE)
 ```
 
-## Do clustering
+### Clustering analysis
 
-Complete linkage
+Complete linkage agglomerative clustering
 ```{r}
 hc_complete <- hclust(euc_distance, method = 'complete')
 
 # Don't include plot in final
-plot(hc_complete, cex = 0.6, hang = -1)
+# plot(hc_complete, cex = 0.6, hang = -1)
 ```
 
-Single linkage
+Single linkage agglomerative clustering
 ```{r}
 hc_single <- hclust(euc_distance, method = 'single')
 
 # Don't include plot in final
-plot(hc_single, cex = 0.6, hang = -1)
+# plot(hc_single, cex = 0.6, hang = -1)
 ```
 
+
+```{r}
+ggdendrogram(hc_complete, rotate = TRUE) +
+  theme_minimal() +
+  labs(x = 'Compound\n', y = 'Distance')
+```
+<br>
+**Figure 1:** Dendrogram of agglomerative clustering by complete linkage for water chemistry by site in Santa Barbara Coastal LTER based on data from 2000 to 2005.
+
+<br>
 Make tanglegram to compare clustering from single and complete linkage
 ```{r}
 ### convert to class dendrogram
@@ -87,17 +97,4 @@ dend_single <- as.dendrogram(hc_single)
 tanglegram(dend_complete, dend_single)
 ```
 
-### Make a **pretty** ggplot dendrogram
 
-```{r}
-ggdendrogram(hc_complete, rotate = TRUE) +
-  theme_minimal() +
-  labs(x = 'Country', y = 'Distance')
-```
-
-
-
-
-For Task 2, use hierarchical clustering by complete linkage to create a dendrogram showing multivariate clustering for water chemistry by site.
-
-To perform hierarchical clustering by site, you’ll want to make a data frame that has a single summary row per site (e.g. based on means from all observations at that site), then calculate the Euclidean distance before performing complete linkage agglomerative hierarchical clustering. 

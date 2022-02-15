@@ -2,10 +2,19 @@
 title: 'Task 1: PCA (PELEGRI)'
 author: "Patrick Pelegri-O'Day"
 date: "2/13/2022"
-output: html_document
-  code_folding: hide # fix to correct syntax
+output:
+  html_document: 
+    theme: flatly
+    highlight: pygments
+    code_folding: hide
 ---
 
+### Overview
+This brief describes the relationship among environmental variables across all countries of the world using a PCA analysis. The data are compiled from publicly available remote sensing datasets. Most of the data is derived by calculating the mean for each country at a reduction scale of about 10km.
+
+**Citation:** Compiled and provided by @zander_venter on Kaggle. The data are acquired from Google Earth Engine (https://earthengine.google.com/).
+
+### Setup
 ```{r setup, include=TRUE, message = FALSE, warning = FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
@@ -15,20 +24,38 @@ library(ggfortify)
 library(patchwork)
 ```
 
-## Overview
-A useful descriptive introductory summary (3 - 4 sentences) that helps the audience understand the data (include a citation as necessary) and what you’ll be exploring
-
+Find NA values and describe my justification for dropping them / how many I'm dropping
 ```{r read in data}
 
-# Find NA values and describe my justification for dropping them / how many I'm dropping
 env_df <- read_csv(here('data', 'world_env_vars.csv')) %>% 
   drop_na()
 
 
 ```
 
+Variables I'm interested in
+- cropland_cover
+- tree_canopy_cover
+- rain_driestMonth
+- rain_wettestMonth
+- rain_mean_annual
+- rain_seasonality
+- temp_annual_range
+- temp_diurnal_range
+- temp_mean_annual
+- temp_seasonality
+- wind
+- cloudiness
+
+Select variables of interest
+```{r}
+env_sub_df <- env_df %>% 
+  select(Country, accessibility_to_cities, tree_canopy_cover, rain_driestMonth,rain_wettestMonth, rain_mean_annual, rain_seasonailty, temp_annual_range, temp_diurnal_range, temp_mean_annual, temp_seasonality, wind, cloudiness)
+```
+
+
 ```{r create pca object}
-env_pca <- env_df %>% 
+env_pca <- env_sub_df %>% 
   select(-Country) %>% # drop country because all variables for pca need to be numeric
   prcomp(scale = TRUE) # scale the variables so they're directly comparable
 
@@ -36,11 +63,12 @@ env_pca <- env_df %>%
 
 ```
 
-### biplot
+### Analysis
 
+Create biplot
 ```{r}
 autoplot(env_pca,
-         data = env_df,
+         data = env_sub_df,
          loadings = TRUE,
          loadings.label = TRUE, # show labels of original vectors
          loadings.colour = 'black',
