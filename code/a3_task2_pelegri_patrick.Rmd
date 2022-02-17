@@ -43,7 +43,7 @@ To perform hierarchical clustering by site, we need to reformat the data so that
 # Group by site code and summarize to get mean of each variable
 water_summarize_df <- water_dropna_df %>% 
   group_by(site_code) %>% # for each site...
-  summarize_all(~mean(.x), na.rm = TRUE)  # ...take mean of each column
+  summarize_all(mean, na.rm = TRUE)  # ...take mean of each column
   
 # Remove character variables and scale numerical values  
 water_scaled_df <- water_summarize_df %>% 
