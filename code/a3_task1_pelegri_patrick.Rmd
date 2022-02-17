@@ -26,11 +26,8 @@ library(patchwork)
 
 Find NA values and describe my justification for dropping them / how many I'm dropping
 ```{r read in data}
-
-env_df <- read_csv(here('data', 'world_env_vars.csv')) %>% 
-  drop_na()
-
-
+env_df <- read_csv(here('data', 'world_env_vars.csv'))%>% 
+  drop_na() # Variable with the most NAs is wind with 55. Most others are 5 or 6
 ```
 
 Variables I'm interested in
@@ -59,16 +56,19 @@ env_pca <- env_sub_df %>%
   select(-Country) %>% # drop country because all variables for pca need to be numeric
   prcomp(scale = TRUE) # scale the variables so they're directly comparable
 
-# rownames(env_pca) <- env_df$Country # I don't think this works for biplot
-
 ```
 
 ### Analysis
 
 Create biplot
+- Define colors for three types of arrows: temperature, rainfall, and other
+- Replace column names with nicer labels
+- Group the countries by continent and give them different shapes or colors?
 ```{r}
 autoplot(env_pca,
          data = env_sub_df,
+         x = 1,
+         y = 2,
          loadings = TRUE,
          loadings.label = TRUE, # show labels of original vectors
          loadings.colour = 'black',
@@ -77,12 +77,35 @@ autoplot(env_pca,
   scale_color_manual(values = c('darkslateblue', 'cornsilk4', 'orange4')) +
   theme_minimal()
 ```
+**PCA plot 1 takeaways:**
+- Precipitation (mean annual rainfall and rainfall in wettest month) and temperature variability (temperature seasonality and temperature range) were highly inversely correlated.
+- Interestingly, rain seasonality was almost completely unrelated to temperature seasonality
+- Tree canopy was positively correlated mean and wettest month rainfall, while negatively correlated with temperature seasonality and temperature range. This aligns with our knowledge that trees need a high level of precipitation to thrive. While we cannot infer causality from the correlation, it raises an interesting questions about whether the presence of forests serves as a buffer against temperature extremes, or whether temperature extremes undermine trees' survivability.
+- Driest month of rainfall was negatively correlated with temperature range, perhaps pointing to the fact that desert-like environments have large temperature swings throughout the day.
+- The variation in accessibility to cities was not captured very well by PCA 1 or PCA 2, indicating a weak relationship between accessibility to cities and the other variables analyzed.
 
 ```{r}
 screeplot(env_pca, type = 'lines')
 ```
 
+**Screeplot takeaways:**
+- The first two PCAs capture a very large portion of the variance.
+- The most visible "elbow" in the screeplot occurs after the third PCA is accounted for. In order to show the PCAs that occur before the "elbow" and a set of PCAs that add up to over 80%, an additional PCA plot is shown below comparing PCA 1 to PCA 3.
 
-
-
-A brief summary (nicely formatted and professionally written bulletpoints are fine) highlighting some major takeaways from your PCA that can be gleaned from the biplot (and screeplot, if included) 
+```{r}
+autoplot(env_pca,
+         data = env_sub_df,
+         x = 1,
+         y = 3,
+         loadings = TRUE,
+         loadings.label = TRUE, # show labels of original vectors
+         loadings.colour = 'black',
+         loadings.label.colour = 'black',
+         loadings.label.vjust = -0.5) +
+  scale_color_manual(values = c('darkslateblue', 'cornsilk4', 'orange4')) +
+  theme_minimal()
+```
+**PCA plot 2 takeaways:**
+- Accessibility to cities and wind speeds are loosely correlated with each other, and quite uncorrelated with the other variables.
+- The second strongest correlation with wind is rain seasonality.
+- The second strongest correlation with accessibility to cities is mean annual temperature.
