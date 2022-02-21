@@ -61,12 +61,12 @@ euc_distance <- dist(water_scaled_df, method = 'euclidean', diag = TRUE, upper =
 
 ### Clustering analysis
 
-Complete linkage agglomerative clustering
+Complete linkage clustering
 ```{r}
 hc_complete <- hclust(euc_distance, method = 'complete')
 ```
 
-Single linkage agglomerative clustering
+Single linkage clustering
 ```{r}
 hc_single <- hclust(euc_distance, method = 'single')
 ```
@@ -78,10 +78,11 @@ ggdendrogram(hc_complete, rotate = TRUE) +
   labs(x = 'Compound\n', y = 'Distance')
 ```
 <br>
-**Figure 1:** Dendrogram of agglomerative clustering by complete linkage for water chemistry by site in Santa Barbara Coastal LTER based on data from 2000 to 2005.
+**Figure 1:** Dendrogram of hierarchical clustering by complete linkage for water chemistry by site in Santa Barbara Coastal LTER based on data from 2000 to 2005.
 
 **Dendrogram takeaways**
- - There are three main clusters in the data: ____, ____, ___; ___, ___; and ___
+
+ - There are three main clusters in the data: one that contains the top 3 sites on the graph (TO02, ON02, and BC02), one that contains the subsequent 9 sites on the graph, and one that contains a single site at the bottom (DV01).
  - These clusters indicate stream sites whose water chemistry is most similar to each other. 
 
 <br>
@@ -94,7 +95,8 @@ dend_single <- as.dendrogram(hc_single)
 tanglegram(dend_complete, dend_single)
 ```
 <br>
-**Figure 2:** Tanglegram of aggomerative clustering by complete linkage vs. single linkaage for water chemistry by site in the Santa Barbara Coastal LTER based on data from 2000 to 2005.
+**Figure 2:** Tanglegram of hierarchical clustering by complete linkage vs. single linkage for water chemistry by site in the Santa Barbara Coastal LTER based on data from 2000 to 2005.
 
 **Tanglegram takeaways:**
- - Most stream sites are grouped differently when comparing clustering results by complete linkage vs. single inkage.
+
+ - Most stream sites (9 out of 13) are grouped differently when comparing clustering results by complete linkage vs. single linkage.
