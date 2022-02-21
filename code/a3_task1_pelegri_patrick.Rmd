@@ -39,7 +39,7 @@ library(patchwork)
 - Mean annual temperature
 - Temperature seasonality
 
-**NA values:** 12 countries are dropped due to NA values, primarily due to countries that do not have data on tree canopy cover
+**NA values:** 12 countries are dropped due to NA values, primarily due to countries that do not have data on tree canopy cover.
 
 Read in data
 ```{r read in data}
@@ -76,9 +76,6 @@ env_pca <- env_sub_df %>%
 ### Analysis
 
 Create biplot
-- Define colors for three types of arrows: temperature, rainfall, and other
-- Replace column names with nicer labels
-- Group the countries by continent and give them different shapes or colors?
 ```{r}
 autoplot(env_pca,
          data = env_sub_df,
@@ -101,9 +98,8 @@ autoplot(env_pca,
 - Rain seasonality was almost completely unrelated to temperature seasonality.
 - The variation in accessibility to cities was not captured very well by PCA 1 or PCA 2, indicating a weak relationship between accessibility to cities and the other variables analyzed.
 
+Create screeplot
 ```{r}
-# screeplot(env_pca, type = 'lines', legend.title = 'Screeplot of environmental variables')
-
 sd_vec <- env_pca$sdev
 var_vec <- sd_vec^2
 
@@ -114,16 +110,18 @@ pct_expl_df <- data.frame(v = var_vec,
   mutate(pct_lbl = paste0(round(pct_v * 100, 1), '%'))
 
 ggplot(data = pct_expl_df, aes(x = pc, y = v)) +
-  geom_col() + 
-  geom_text(aes(label = pct_lbl, vjust = 0, nudge_y = 0.0005)) +
-  labs(x = "\nPrincipal component", y = "Variance estimated\n")
+  geom_col(width = 0.8, fill = 'cornsilk4') + 
+  geom_text(aes(label = pct_lbl, vjust = -0.25, nudge_y = 0.0005)) +
+  labs(x = "\nPrincipal component", y = "Variance estimated\n") +
+  theme_minimal()
 ```
 <br>
 **Screeplot takeaways:**
 
  - The first two PCAs capture ~70% of the variance.
  - The most visible "elbows" in the screeplot occur after the third PCA or fourth PCA lis accounted for. In order to show the PCAs that occur before the "elbow" and a set of PCAs that add up to over 80%, an additional PCA plot is shown below comparing PCA 1 to PCA 3.
-
+ 
+Create second biplot
 ```{r}
 autoplot(env_pca,
          data = env_sub_df,
